@@ -10,6 +10,8 @@ This plug-in need `imagemagick` and `texlive/mactex` installed. otherwise it doe
 
 ## Usage
 
+![Preview Equation](https://www.scislab.com/static/media/uploads/PrivateGraphs/latex_preview.gif)
+
 Currently there are two commands available:
 
 ```json
@@ -37,12 +39,20 @@ Users can simply click on the phantom to close a single equation preview.
     "equation_foreground_color": "yellow",
     "equation_background_color": "",
     "equation_size": "45%",
-    "picture_width": "",
     "convert_binary": "",
     "pdflatex_binary": "",
     "debug": 1
 }
 
 ```
-- equation_foreground_color is the
+- equation_foreground_color is the color of preview equations.
 
+- equation_background_color is the color of preview background.
+
+- equation_size is to adjust the size.
+
+- convert_binary is the path of `convert`, which is a part of imagemagick package.
+
+- pdflatex_binary is the path of pdflatex executable.
+
+- debug == 1 will show additional information in the console.
