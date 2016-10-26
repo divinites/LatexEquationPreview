@@ -1,9 +1,10 @@
 {
     "equation_foreground_color": "yellow",
     "equation_background_color": "",
-    "equation_size": "45%",
-    "picture_width": "",
+    "equation_inline_size": "45%",
+    "equation_block_size": "60%",
+    "auto_compile": true,
     "convert_binary": "",
     "pdflatex_binary": "",
-    "debug": 1
+    "debug": 0
 }

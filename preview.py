@@ -1,21 +1,66 @@
 import sublime_plugin
 import tempfile
 import sublime
-from .helper import ViewConverter, FileConverter, log, settings
-from .helper import INLINE_SCOPE, BLOCK_SCOPE, INLINE_FLAG, BLOCK_FLAG
+from .helper import log, INLINE_SCOPE, BLOCK_SCOPE, PHANTOM_GROUP
+from .helper import to_phantom, plugin_settings
 import threading
 
 
 def plugin_loaded():
-    global temp_dir, settings, phantom_list, phantom_key
+    global temp_dir, phantom_keys
     temp_dir = tempfile.TemporaryDirectory(prefix='Eqn_Prev')
-    settings.update(sublime.load_settings("latex_equation_preview.sublime-settings"))
-    phantom_key = []
+    phantom_keys = ['live_update']
+    plugin_settings.update(
+        sublime.load_settings("latex_equation_preview.sublime-settings"))
 
 
 def plugin_unloaded():
     global temp_dir
     temp_dir.cleanup()
+
+
+class PreviewMonitor(sublime_plugin.ViewEventListener):
+    def __init__(self, view):
+        self.view = view
+        self.timeout_scheduled = False
+        self.needs_update = False
+        self.phantom_set = sublime.PhantomSet(view, "live_update")
+
+    @classmethod
+    def is_applicable(cls, settings):
+        syntax = settings.get('syntax')
+        return 'TeX' in syntax and plugin_settings.get('auto_compile')
+
+    def on_modified_async(self):
+        cursor = self.view.sel()[0].a
+        if (not self.view.match_selector(cursor, INLINE_SCOPE)) and (
+            not self.view.match_selector(cursor, BLOCK_SCOPE)):
+            return
+        else:
+            if self.timeout_scheduled:
+                self.needs_update = True
+            else:
+                sublime.set_timeout(lambda: self.handle_timeout(), 500)
+                try:
+                    self.update_phantoms()
+                except:
+                    pass
+
+    def update_phantoms(self):
+        global temp_dir
+        phantoms = []
+        raw_phantom = to_phantom(self.view, temp_dir.name)
+        phantoms.append(sublime.Phantom(raw_phantom['region'],
+                                        raw_phantom['content'],
+                                        raw_phantom['layout'],
+                                        on_navigate=lambda x: self.phantom_set.update([])))
+        self.phantom_set.update(phantoms)
+
+    def handle_timeout(self):
+        self.timeout_scheduled = False
+        if self.needs_update:
+            self.needs_update = False
+            self.update_phantoms()
 
 
 class ShowOutstandingPreviewCommand(sublime_plugin.WindowCommand):
@@ -38,9 +83,9 @@ class CleanEquationPhantoms(sublime_plugin.WindowCommand):
         return False
 
     def run(self):
-        global phantom_key
+        global phantom_keys
         view = self.window.active_view()
-        for key in phantom_key:
+        for key in phantom_keys:
             view.erase_phantoms(key)
 
 
@@ -48,38 +93,16 @@ class ShowEquationPhantom(threading.Thread):
     def __init__(self, view):
         super(ShowEquationPhantom, self).__init__(self)
         self.view = view
-        self.phantom_set = sublime.PhantomSet(self.view, "latex_equation")
 
     def run(self):
-        global temp_dir, settings, phantom_key
-        view_converter = ViewConverter(self.view)
-        content_region, FLAG = view_converter.find_equation_range()
-        log("region is {} and flag is {}".format(repr(content_region), repr(FLAG)))
-        if content_region:
-            file_converter = FileConverter(temp_dir.name)
-            log("temp_dir is {}".format(temp_dir.name))
-            tex_file = file_converter.create_temptex(self.view.substr(content_region))
-            png_file = file_converter.tex_to_png(tex_file)
-            log("png file is {}".format(png_file))
-            png_str = file_converter.png_to_datastr(png_file)
-            html_str = """
-            <style>
-            .block {{
-                background-color:{};
-                position:relative;
-                top: -12px;
-                display: inline;
-            }}
-            </style>
-            <span class="block">
-            <a href="#"><img src="data:image/png;base64,{}" /></a>
-            </span>
-            """.format(settings.get("equation_background_color"), png_str)
-            phantom_name = "latex_equation" + str(content_region.b)
-            phantom_key.append(phantom_name)
-            self.view.add_phantom(phantom_name,
-                                  sublime.Region(content_region.b, content_region.b + 1),
-                                  html_str,
-                                  sublime.LAYOUT_BLOCK if FLAG == BLOCK_FLAG else sublime.LAYOUT_INLINE,
-                                  on_navigate=lambda href: self.view.erase_phantoms(phantom_name))
+        global temp_dir, phantom_keys
+        raw_phantom = to_phantom(self.view, temp_dir.name)
+        phantom_name = PHANTOM_GROUP + str(raw_phantom['region'].b)
+        phantom_keys.append(phantom_name)
+        self.view.add_phantom(phantom_name,
+                              raw_phantom['region'],
+                              raw_phantom['content'],
+                              raw_phantom['layout'],
+                              raw_phantom['on_navigate'])
+
 
