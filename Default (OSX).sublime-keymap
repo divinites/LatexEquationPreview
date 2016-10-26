@@ -1,0 +1,16 @@
+[
+        { "keys": [ "ctrl+shift+x" ],
+          "command": "show_outstanding_preview",
+          "context": [
+                      {"key": "selector", "operand": "text.tex.latex", "operator": "equal"}
+                      ]
+        },
+        { "keys": [ "ctrl+shift+alt+x" ],
+          "command": "clean_equation_phantoms",
+          "context": [
+                      {"key": "selector", "operand": "text.tex.latex", "operator": "equal"}
+                      ]
+        },
+
+
+]

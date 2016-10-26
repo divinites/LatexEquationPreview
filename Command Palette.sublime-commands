@@ -1,0 +1,11 @@
+[
+    {
+        "caption": "Equation Preview: View Current Equation",
+        "command": "show_outstanding_preview"
+    },
+    {
+        "caption": "Equation Preview: Clear Equation Preview",
+        "command": "clean_equation_phantoms"
+    },
+
+]

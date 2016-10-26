@@ -1,7 +1,9 @@
 {
-    "equation_color": "yellow",
-    "equation_size": "100%",
+    "equation_foreground_color": "yellow",
+    "equation_background_color": "",
+    "equation_size": "45%",
     "picture_width": "",
     "convert_binary": "",
-    "pdflatex_binary": ""
+    "pdflatex_binary": "",
+    "debug": 1
 }
