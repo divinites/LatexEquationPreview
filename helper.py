@@ -1,7 +1,7 @@
 import sublime
 import tempfile
 import subprocess
-from subprocess import shutup
+from subprocess import DEVNULL
 import base64
 from subprocess import CalledProcessError
 import os
@@ -78,12 +78,17 @@ class FileConverter:
     def __init__(self, directory):
         self.directory = directory
 
-    def create_temptex(self, content):
-        with tempfile.NamedTemporaryFile(
-                suffix=".tex", prefix="eqn", dir=self.directory,
-                delete=False) as texfile:
-            texfile.write(bytes(HEAD(content), 'UTF-8'))
-            return texfile.name
+    def create_temptex(self, content, file_name=None):
+        if not file_name:
+            with tempfile.NamedTemporaryFile(
+                    suffix=".tex", prefix="eqn", dir=self.directory,
+                    delete=False) as texfile:
+                texfile.write(bytes(HEAD(content), 'UTF-8'))
+                return texfile.name
+        else:
+            with open(file_name, mode='wt+') as texfile:
+                texfile.write(HEAD(content))
+            return file_name
 
     def tex_to_png(self, file, flag):
         if not file.endswith('.tex'):
@@ -97,20 +102,16 @@ class FileConverter:
         directory, _ = os.path.split(file)
         os.chdir(directory)
         compile_cmd = [pdflatex, file]
-        convert_cmd = [convert, '-density', '300', pdf_name, "-resize", "75%",
-                       png_name]
-        trim_cmd = [convert, png_name, '-trim', png_name]
+        convert_cmd = [convert, '-density',
+                       '300', '-trim', '-quality', '100',
+                       pdf_name, png_name]
         foreground_color = plugin_settings.get('equation_foreground_color', 'red')
-        # background_color = sublime.load_settings(
-        #     "latex_equation_preview.sublime-settings").get(
-        #         'equation_background_color', "none")
         inline_size = plugin_settings.get('equation_inline_size', '100%')
         block_size = plugin_settings.get("equation_block_size", '100%')
         foreground_color_cmd = [convert, png_name, "-alpha", "off", "-fuzz",
                                 "10%", '-fill', foreground_color, '-opaque',
                                 'black', "-alpha", "on", png_name]
-        command_sequence = [compile_cmd, convert_cmd, trim_cmd,
-                            foreground_color_cmd]
+        command_sequence = [compile_cmd, convert_cmd, foreground_color_cmd]
         if flag == INLINE_FLAG:
             size = inline_size
         elif flag == BLOCK_FLAG:
@@ -121,17 +122,11 @@ class FileConverter:
         if size != "100%":
             resize_cmd = [convert, png_name, "-resize", size, png_name]
             command_sequence.append(resize_cmd)
-        # if background_color != "none":
-        #     log("background color is {}".format(background_color))
-        #     background_color_cmd = [convert, png_name, '-background', background_color, png_name]
-        #     command_sequence.append(background_color_cmd)
-
-        try:
-            for cmd in command_sequence:
-                subprocess.check_call(cmd, stdout=shutup, stderr=shutup)
-            # subprocess.call(clean_up_cmd)
-        except CalledProcessError as e:
-            print(e)
+        for cmd in command_sequence:
+            try:
+                subprocess.check_call(cmd, stdout=DEVNULL, stderr=DEVNULL)
+            except CalledProcessError:
+                pass
         return png_name
 
     def png_to_datastr(self, png_file):
@@ -146,7 +141,7 @@ def log(info):
         print("LatexEquationPreview >>> " + info)
 
 
-def to_phantom(view, dir_name):
+def to_phantom(view, dir_name, file_name=None):
     view_converter = ViewConverter(view)
     content_region, FLAG = view_converter.find_equation_range()
     log("region is {} and flag is {}".format(
@@ -154,7 +149,7 @@ def to_phantom(view, dir_name):
     if content_region:
         file_converter = FileConverter(dir_name)
         log("temp_dir is {}".format(dir_name))
-        tex_file = file_converter.create_temptex(view.substr(content_region))
+        tex_file = file_converter.create_temptex(view.substr(content_region), file_name)
         png_file = file_converter.tex_to_png(tex_file, FLAG)
         log("png file is {}".format(png_file))
         png_str = file_converter.png_to_datastr(png_file)
@@ -172,6 +167,7 @@ def to_phantom(view, dir_name):
         </span>
         """.format(plugin_settings.get("equation_background_color"), png_str)
         group_name = PHANTOM_GROUP + str(content_region.b + 1)
+        log('group_name is {}'.format(group_name))
         return {"region": sublime.Region(content_region.b, content_region.b + 1),
                 "content": html_str,
                 "layout": sublime.LAYOUT_BLOCK if FLAG == BLOCK_FLAG else sublime.LAYOUT_INLINE,

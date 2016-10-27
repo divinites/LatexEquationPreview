@@ -3,20 +3,35 @@ import tempfile
 import sublime
 from .helper import log, INLINE_SCOPE, BLOCK_SCOPE, PHANTOM_GROUP
 from .helper import to_phantom, plugin_settings
+import os
 import threading
 
 
 def plugin_loaded():
-    global temp_dir, phantom_keys
+    global temp_dir, phantom_keys, temp_file_name
     temp_dir = tempfile.TemporaryDirectory(prefix='Eqn_Prev')
+    log("temp_dir name is {}".format(temp_dir.name))
+    temp_file = tempfile.NamedTemporaryFile(suffix=".tex",
+                                            prefix="auto_eqn",
+                                            dir=temp_dir.name,
+                                            delete=False)
+    temp_file_name = temp_file.name
+    log("temp_file_name is {}".format(temp_file_name))
+    temp_file.close()
     phantom_keys = ['live_update']
     plugin_settings.update(
         sublime.load_settings("latex_equation_preview.sublime-settings"))
 
 
 def plugin_unloaded():
-    global temp_dir
-    temp_dir.cleanup()
+    global temp_dir, temp_file_name
+    try:
+        temp_dir.cleanup()
+        log('temp_dir removed')
+        os.remove(temp_file_name)
+        log('temp_file removed')
+    except:
+        pass
 
 
 class PreviewMonitor(sublime_plugin.ViewEventListener):
@@ -47,9 +62,10 @@ class PreviewMonitor(sublime_plugin.ViewEventListener):
                     pass
 
     def update_phantoms(self):
-        global temp_dir
+        global temp_dir, temp_file_name
         phantoms = []
-        raw_phantom = to_phantom(self.view, temp_dir.name)
+        log("temp_file is {}".format(temp_file_name))
+        raw_phantom = to_phantom(self.view, temp_dir.name, temp_file_name)
         phantoms.append(sublime.Phantom(raw_phantom['region'],
                                         raw_phantom['content'],
                                         raw_phantom['layout'],
