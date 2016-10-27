@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <meta charset="UTF-8">
+    <title>Latex Equation Preview by divinites</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" type="text/css" href="stylesheets/normalize.css" media="screen">
+    <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,700' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/github-light.css" media="screen">
+  </head>
+  <body>
+    <section class="page-header">
+      <h1 class="project-name">Latex Equation Preview</h1>
+      <h2 class="project-tagline">Inside Sublime Text</h2>
+      <a href="https://github.com/divinites/LatexEquationPreview" class="btn">View on GitHub</a>
+      <a href="https://github.com/divinites/LatexEquationPreview/zipball/master" class="btn">Download .zip</a>
+      <a href="https://github.com/divinites/LatexEquationPreview/tarball/master" class="btn">Download .tar.gz</a>
+    </section>
+
+    <section class="main-content">
+      <h1>
+<a id="latexequationpreview" class="anchor" href="#latexequationpreview" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>LatexEquationPreview</h1>
+
+<h2>
+<a id="introduction" class="anchor" href="#introduction" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Introduction</h2>
+
+<p>This plug-in make use of the new feature of Sublime Text, Phantom, to preview latex equations.</p>
+
+<p><strong>ATTENTION</strong></p>
+
+<p>This plug-in need <code>imagemagick</code> and <code>texlive/mactex</code> installed. otherwise it does not work.</p>
+
+<h2>
+<a id="usage" class="anchor" href="#usage" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Usage</h2>
+
+<p><img src="https://www.scislab.com/static/media/uploads/PrivateGraphs/latex_preview.gif" alt="Preview Equation">
+<img src="https://www.scislab.com/static/media/uploads/PrivateGraphs/auto_compile.gif" alt="Auto Compilation"></p>
+
+<p>Currently there are two commands available:</p>
+
+<div class="highlight highlight-source-json"><pre>
+[
+    {
+        <span class="pl-s"><span class="pl-pds">"</span>caption<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>Equation Preview: View Current Equation<span class="pl-pds">"</span></span>,
+        <span class="pl-s"><span class="pl-pds">"</span>command<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>show_outstanding_preview<span class="pl-pds">"</span></span>
+    },
+    {
+        <span class="pl-s"><span class="pl-pds">"</span>caption<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>Equation Preview: Clear Equation Preview<span class="pl-pds">"</span></span>,
+        <span class="pl-s"><span class="pl-pds">"</span>command<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>clean_equation_phantoms<span class="pl-pds">"</span></span>
+    },
+
+]</pre></div>
+
+<p>Corresponding shortcut is <kbd>ctrl+shift+x</kbd> for show preview and <kbd>ctrl+shift+alt+x</kbd> for clean all preview.</p>
+
+<p>Users can simply click on the phantom to close a single equation preview.</p>
+
+<h2>
+<a id="configuration" class="anchor" href="#configuration" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Configuration</h2>
+
+<div class="highlight highlight-source-json"><pre>{
+    <span class="pl-s"><span class="pl-pds">"</span>equation_foreground_color<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>yellow<span class="pl-pds">"</span></span>,
+    <span class="pl-s"><span class="pl-pds">"</span>equation_background_color<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span><span class="pl-pds">"</span></span>,
+    <span class="pl-s"><span class="pl-pds">"</span>equation_inline_size<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>45%<span class="pl-pds">"</span></span>,
+    <span class="pl-s"><span class="pl-pds">"</span>equation_block_size<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>60%<span class="pl-pds">"</span></span>,
+    <span class="pl-s"><span class="pl-pds">"</span>auto_compile<span class="pl-pds">"</span></span>: <span class="pl-c1">true</span>,
+    <span class="pl-s"><span class="pl-pds">"</span>convert_binary<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span><span class="pl-pds">"</span></span>,
+    <span class="pl-s"><span class="pl-pds">"</span>pdflatex_binary<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span><span class="pl-pds">"</span></span>,
+    <span class="pl-s"><span class="pl-pds">"</span>debug<span class="pl-pds">"</span></span>: <span class="pl-c1">0</span>
+}
+</pre></div>
+
+<ul>
+<li><p>equation_foreground_color is the color of preview equations.</p></li>
+<li><p>equation_background_color is the color of preview background.</p></li>
+<li><p>equation_inline/block_size is to adjust the font size of inline/block equations.</p></li>
+<li><p>auto_comile is an amazing feature, it will simultaneously compile the equations that users are writing and show it in the phantom.</p></li>
+<li><p>convert_binary is the path of <code>convert</code>, which is a part of imagemagick package.</p></li>
+<li><p>pdflatex_binary is the path of pdflatex executable.</p></li>
+<li><p>debug == 1 will show additional information in the console.</p></li>
+</ul>
+
+      <footer class="site-footer">
+        <span class="site-footer-owner"><a href="https://github.com/divinites/LatexEquationPreview">Latex Equation Preview</a> is maintained by <a href="https://github.com/divinites">divinites</a>.</span>
+
+        <span class="site-footer-credits">This page was generated by <a href="https://pages.github.com">GitHub Pages</a> using the <a href="https://github.com/jasonlong/cayman-theme">Cayman theme</a> by <a href="https://twitter.com/jasonlong">Jason Long</a>.</span>
+      </footer>
+
+    </section>
+
+  
+  </body>
+</html>
