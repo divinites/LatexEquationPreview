@@ -10,13 +10,11 @@ import threading
 def plugin_loaded():
     global temp_dir, phantom_keys, temp_file_name
     temp_dir = tempfile.TemporaryDirectory(prefix='Eqn_Prev')
-    log("temp_dir name is {}".format(temp_dir.name))
     temp_file = tempfile.NamedTemporaryFile(suffix=".tex",
                                             prefix="auto_eqn",
                                             dir=temp_dir.name,
                                             delete=False)
     temp_file_name = temp_file.name
-    log("temp_file_name is {}".format(temp_file_name))
     temp_file.close()
     phantom_keys = ['live_update']
     plugin_settings.update(
