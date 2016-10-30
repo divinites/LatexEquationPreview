@@ -8,6 +8,10 @@ This plug-in make use of the new feature of Sublime Text, Phantom, to preview la
 
 This plug-in need `imagemagick` and `texlive/mactex` installed. otherwise it does not work.
 
+If you do not have Tex installed, you won't need this plugin.
+
+imagemagick can be downloaded [here](http://www.imagemagick.org/script/binary-releases.php)
+
 ## Usage
 
 ![Preview Equation](https://www.scislab.com/static/media/uploads/PrivateGraphs/latex_preview.gif)
