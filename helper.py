@@ -158,7 +158,6 @@ def to_phantom(view, dir_name, file_name=None):
         .block {{
             background-color:{};
             position:relative;
-            top: -12px;
             display: inline;
         }}
         </style>
