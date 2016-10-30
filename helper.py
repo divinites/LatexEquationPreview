@@ -97,8 +97,8 @@ class FileConverter:
             pdf_name = file[:-3] + "pdf"
             png_name = file[:-3] + "png"
 
-        pdflatex = plugin_settings.get("pdflatex_binary", "pdflatex")
-        convert = plugin_settings.get("convert_binary", "convert")
+        pdflatex = plugin_settings.get("pdflatex_binary", "pdflatex" if sublime.platform() != 'windows' else 'pdflatex.exe')
+        convert = plugin_settings.get("convert_binary", "convert" if sublime.platform() != 'windows' else 'convert.exe')
         directory, _ = os.path.split(file)
         os.chdir(directory)
         compile_cmd = [pdflatex, file]
