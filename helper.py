@@ -31,7 +31,7 @@ class Setting:
 
     def get(self, key, value=None):
         if self.settings:
-            return self.settings.get(key, value)
+            return self.settings.get(key, value) if self.settings.get(key, value) else value
 
     def update(self, setting_object):
         self.settings = setting_object
@@ -97,8 +97,8 @@ class FileConverter:
             pdf_name = file[:-3] + "pdf"
             png_name = file[:-3] + "png"
 
-        pdflatex = 'pdflatex'
-        convert = 'convert'
+        pdflatex = plugin_settings.get("pdflatex_binary", "pdflatex")
+        convert = plugin_settings.get("convert_binary", "convert")
         directory, _ = os.path.split(file)
         os.chdir(directory)
         compile_cmd = [pdflatex, file]
