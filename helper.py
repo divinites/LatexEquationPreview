@@ -36,7 +36,6 @@ class Setting:
     def update(self, setting_object):
         self.settings = setting_object
 
-
 plugin_settings = Setting()
 
 
