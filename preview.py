@@ -1,7 +1,7 @@
 import sublime_plugin
 import tempfile
 import sublime
-from .helper import log, INLINE_SCOPE, BLOCK_SCOPE, PHANTOM_GROUP
+from .helper import log, PHANTOM_GROUP
 from .helper import to_phantom, plugin_settings, is_inside_equation
 import os
 import threading

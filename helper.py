@@ -17,9 +17,12 @@ HEAD = lambda x: """
 \\end{document}
 """
 
-INLINE_SCOPE = "meta.environment.math.inline.dollar.latex"
-BLOCK_SCOPE = "meta.environment.math.block.be.latex"
+DOLLAR_INLINE_SCOPE = "meta.environment.math.inline.dollar.latex"
+DOLLAR_BLOCK_SCOPE = "meta.environment.math.block.dollar.latex"
+BE_BLOCK_SCOPE = "meta.environment.math.block.be.latex"
+LATEXPLUS_SCOPE = "meta.function.environment.math.latex"
 
+SCOPES = [DOLLAR_INLINE_SCOPE, DOLLAR_BLOCK_SCOPE, BE_BLOCK_SCOPE, LATEXPLUS_SCOPE]
 INLINE_FLAG = 0
 BLOCK_FLAG = 1
 PHANTOM_GROUP = 'latex_equation'
@@ -48,31 +51,59 @@ class ViewConverter:
 
     # def update_visible_region(self):
     #     self.visible_region = self.view.visible_region()
+    def is_inline(self, point):
+        if self.view.match_selector(point, DOLLAR_INLINE_SCOPE):
+            return True
+        if self.view.match_selector(point, DOLLAR_BLOCK_SCOPE):
+            return False
+        if self.view.match_selector(point, BE_BLOCK_SCOPE):
+            return False
+        if self.view.match_selector(point, LATEXPLUS_SCOPE):
+            return False
+        return None
+
+    def find_scope(self, point):
+        if self.view.match_selector(point, DOLLAR_INLINE_SCOPE):
+            return DOLLAR_INLINE_SCOPE
+        if self.view.match_selector(point, DOLLAR_BLOCK_SCOPE):
+            return DOLLAR_BLOCK_SCOPE
+        if self.view.match_selector(point, BE_BLOCK_SCOPE):
+            return BE_BLOCK_SCOPE
+        if self.view.match_selector(point, LATEXPLUS_SCOPE):
+            return LATEXPLUS_SCOPE
+        return
 
     def find_equation_range(self):
         start = self.view.sel()[0].a
         end = self.view.sel()[0].b
-        if self.view.match_selector(start, INLINE_SCOPE):
-            selector = INLINE_SCOPE
-        elif self.view.match_selector(start, BLOCK_SCOPE):
-            selector = BLOCK_SCOPE
-        else:
-            return
-        while self.view.match_selector(start, selector):
-            start -= 1
-            if start < 0:
+        selector = self.find_scope(start)
+        if selector:
+            while self.view.match_selector(start, selector):
+                start -= 1
+                if start < 0:
+                    return
+            while self.view.match_selector(end, selector):
+                end += 1
+                if end > self.view.size():
+                    return
+            if selector == BE_BLOCK_SCOPE:
+                return sublime.Region(
+                    self.view.line(start).a, self.view.line(end).b), BLOCK_FLAG
+            elif selector == DOLLAR_INLINE_SCOPE:
+                return sublime.Region(start + 1, end), INLINE_FLAG
+            elif selector == DOLLAR_BLOCK_SCOPE:
+                return sublime.Region(start + 2, end + 1), BLOCK_FLAG
+            elif selector == LATEXPLUS_SCOPE:
+                if self.view.substr(sublime.Region(end, end)) == '$':
+                    if self.view.substr(sublime.Region(end + 1, end + 1)) == '$':
+                        return sublime.Region(start + 2, end + 1), BLOCK_FLAG
+                    else:
+                        return sublime.Region(start + 1, end), INLINE_FLAG
+                else:
+                    return sublime.Region(
+                        self.view.line(start).a, self.view.line(end).b), BLOCK_FLAG
+            else:
                 return
-        while self.view.match_selector(end, selector):
-            end += 1
-            if end > self.view.size():
-                return
-        if selector == BLOCK_SCOPE:
-            return sublime.Region(
-                self.view.line(start).a, self.view.line(end).b), BLOCK_FLAG
-        elif selector == INLINE_SCOPE:
-            return sublime.Region(start + 1, end), INLINE_FLAG
-        else:
-            return
 
 
 class FileConverter:
@@ -182,8 +213,9 @@ def to_phantom(view, dir_name, file_name=None):
 
 def is_inside_equation(view):
     cursor = view.sel()[0].a
-    if view.match_selector(cursor, INLINE_SCOPE) or view.match_selector(cursor, BLOCK_SCOPE):
-        return True
+    for scope in SCOPES:
+        if view.match_selector(cursor, scope):
+            return True
     return False
 
 
