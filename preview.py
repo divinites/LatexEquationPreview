@@ -90,6 +90,8 @@ class ShowOutstandingPreviewCommand(sublime_plugin.WindowCommand):
         if "meta.environment.math.block.be.latex" in current_cursor or "meta.environment.math.inline.dollar.latex" in current_cursor:
             show_equation = ShowEquationPhantom(self.window.active_view())
             show_equation.start()
+        else:
+            log("not in the scope.")
 
 
 class CleanEquationPhantoms(sublime_plugin.WindowCommand):
