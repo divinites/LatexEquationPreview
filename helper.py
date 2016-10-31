@@ -31,10 +31,12 @@ class Setting:
 
     def get(self, key, value=None):
         if self.settings:
-            return self.settings.get(key, value) if self.settings.get(key, value) else value
+            return self.settings.get(key, value) if self.settings.get(
+                key, value) else value
 
     def update(self, setting_object):
         self.settings = setting_object
+
 
 plugin_settings = Setting()
 
@@ -96,15 +98,19 @@ class FileConverter:
             pdf_name = file[:-3] + "pdf"
             png_name = file[:-3] + "png"
 
-        pdflatex = plugin_settings.get("pdflatex_binary", "pdflatex" if sublime.platform() != 'windows' else 'pdflatex.exe')
-        convert = plugin_settings.get("convert_binary", "convert" if sublime.platform() != 'windows' else 'convert.exe')
+        pdflatex = plugin_settings.get("pdflatex_binary", "pdflatex"
+                                       if sublime.platform() != 'windows' else
+                                       'pdflatex.exe')
+        convert = plugin_settings.get("convert_binary", "convert"
+                                      if sublime.platform() != 'windows' else
+                                      'convert.exe')
         directory, _ = os.path.split(file)
         os.chdir(directory)
         compile_cmd = [pdflatex, file]
-        convert_cmd = [convert, '-density',
-                       '300', '-trim', '-quality', '100',
+        convert_cmd = [convert, '-density', '300', '-trim', '-quality', '100',
                        pdf_name, png_name]
-        foreground_color = plugin_settings.get('equation_foreground_color', 'red')
+        foreground_color = plugin_settings.get('equation_foreground_color',
+                                               'red')
         inline_size = plugin_settings.get('equation_inline_size', '100%')
         block_size = plugin_settings.get("equation_block_size", '100%')
         foreground_color_cmd = [convert, png_name, "-alpha", "off", "-fuzz",
@@ -143,12 +149,12 @@ def log(info):
 def to_phantom(view, dir_name, file_name=None):
     view_converter = ViewConverter(view)
     content_region, FLAG = view_converter.find_equation_range()
-    log("region is {} and flag is {}".format(
-        repr(content_region), repr(FLAG)))
+    log("region is {} and flag is {}".format(repr(content_region), repr(FLAG)))
     if content_region:
         file_converter = FileConverter(dir_name)
         log("temp_dir is {}".format(dir_name))
-        tex_file = file_converter.create_temptex(view.substr(content_region), file_name)
+        tex_file = file_converter.create_temptex(
+            view.substr(content_region), file_name)
         png_file = file_converter.tex_to_png(tex_file, FLAG)
         log("png file is {}".format(png_file))
         png_str = file_converter.png_to_datastr(png_file)
@@ -166,10 +172,19 @@ def to_phantom(view, dir_name, file_name=None):
         """.format(plugin_settings.get("equation_background_color"), png_str)
         group_name = PHANTOM_GROUP + str(content_region.b + 1)
         log('group_name is {}'.format(group_name))
-        return {"region": sublime.Region(content_region.b, content_region.b + 1),
+        return {"region":
+                sublime.Region(content_region.b, content_region.b + 1),
                 "content": html_str,
-                "layout": sublime.LAYOUT_BLOCK if FLAG == BLOCK_FLAG else sublime.LAYOUT_INLINE,
+                "layout": sublime.LAYOUT_BLOCK
+                if FLAG == BLOCK_FLAG else sublime.LAYOUT_INLINE,
                 "on_navigate": lambda href: view.erase_phantoms(group_name)}
+
+
+def is_inside_equation(view):
+    cursor = view.sel()[0].a
+    if view.match_selector(cursor, INLINE_SCOPE) or view.match_selector(cursor, BLOCK_SCOPE):
+        return True
+    return False
 
 
 class FileFormatErrorException(Exception):
@@ -178,4 +193,3 @@ class FileFormatErrorException(Exception):
 
 class LatexCommandException(Exception):
     pass
-

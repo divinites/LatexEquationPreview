@@ -2,7 +2,7 @@ import sublime_plugin
 import tempfile
 import sublime
 from .helper import log, INLINE_SCOPE, BLOCK_SCOPE, PHANTOM_GROUP
-from .helper import to_phantom, plugin_settings
+from .helper import to_phantom, plugin_settings, is_inside_equation
 import os
 import threading
 
@@ -45,11 +45,7 @@ class PreviewMonitor(sublime_plugin.ViewEventListener):
         return 'TeX' in syntax and plugin_settings.get('auto_compile')
 
     def on_modified_async(self):
-        cursor = self.view.sel()[0].a
-        if (not self.view.match_selector(cursor, INLINE_SCOPE)) and (
-            not self.view.match_selector(cursor, BLOCK_SCOPE)):
-            return
-        else:
+        if is_inside_equation(self.view):
             if self.timeout_scheduled:
                 self.needs_update = True
             else:
@@ -86,15 +82,14 @@ class ShowOutstandingPreviewCommand(sublime_plugin.WindowCommand):
 
     def run(self):
         view = self.window.active_view()
-        current_cursor = view.scope_name(view.sel()[0].a)
-        if "meta.environment.math.block.be.latex" in current_cursor or "meta.environment.math.inline.dollar.latex" in current_cursor:
+        if is_inside_equation(view):
             show_equation = ShowEquationPhantom(self.window.active_view())
             show_equation.start()
         else:
             log("not in the scope.")
 
 
-class CleanEquationPhantoms(sublime_plugin.WindowCommand):
+class CleanEquationPhantomsCommand(sublime_plugin.WindowCommand):
     def is_enable(self):
         view = self.window.active_view()
         if view.scope_name(0).startswith('text.tex'):
