@@ -13,10 +13,16 @@ If you do not have Tex installed, you won't need this plugin.
 
 imagemagick can be downloaded [here](http://www.imagemagick.org/script/binary-releases.php)
 
+for OSX or MacOS users, the best way to install imagemagick is `brew install imagemagick`.
+
+I tested this plugin with my MacBookPro and windows 10 on Vmware environment, it should be okay for Linux as well, if you find any problem , please do not hesitate to open an issue, I will response in due course.
+
+If you like this project, please star this repository😇. Thanks for your support!
+
 
 ### Special Attention for Windows User:
 
-- To install `convert.exe`, please choose `legacy support` when installing imagemagick.
+- To install `convert.exe`, please choose `legacy support` when installing imagemagick, otherwise it does not work.
 
 - `convert.exe` needs ghostscript support, please download it [here](https://github.com/ArtifexSoftware/ghostpdl-downloads/releases/download/gs920/gs920w32.exe)
 
