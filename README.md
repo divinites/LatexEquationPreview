@@ -4,13 +4,21 @@
 
 This plug-in make use of the new feature of Sublime Text, Phantom, to preview latex equations.
 
-**ATTENTION**
+### ATTENTION
+
 
 This plug-in need `imagemagick` and `texlive/mactex` installed. otherwise it does not work.
 
 If you do not have Tex installed, you won't need this plugin.
 
 imagemagick can be downloaded [here](http://www.imagemagick.org/script/binary-releases.php)
+
+
+### Special Attention for Windows User:
+
+- To install `convert.exe`, please choose `legacy support` when installing imagemagick.
+
+- `convert.exe` needs ghostscript support, please download it [here](https://github.com/ArtifexSoftware/ghostpdl-downloads/releases/download/gs920/gs920w32.exe)
 
 ## Usage
 
@@ -36,6 +44,8 @@ Currently there are two commands available:
 Corresponding shortcut is <kbd>ctrl+shift+x</kbd> for show preview and <kbd>ctrl+shift+alt+x</kbd> for clean all preview.
 
 Users can simply click on the phantom to close a single equation preview.
+
+If auto-compile trigger in settings is set to `true`, then a preview with automatically show up when users are writing an equation.
 
 ## Configuration
 

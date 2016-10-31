@@ -80,13 +80,16 @@ class PreviewMonitor(sublime_plugin.ViewEventListener):
 class ShowOutstandingPreviewCommand(sublime_plugin.WindowCommand):
     def is_enable(self):
         view = self.window.active_view()
-        if view.scope_name(0).startswith('text.tex'):
+        if view.scope_name(0).startswith("text.tex"):
             return True
         return False
 
     def run(self):
-        show_equation = ShowEquationPhantom(self.window.active_view())
-        show_equation.start()
+        view = self.window.active_view()
+        current_cursor = view.scope_name(view.sel()[0].a)
+        if "meta.environment.math.block.be.latex" in current_cursor or "meta.environment.math.inline.dollar.latex" in current_cursor:
+            show_equation = ShowEquationPhantom(self.window.active_view())
+            show_equation.start()
 
 
 class CleanEquationPhantoms(sublime_plugin.WindowCommand):
