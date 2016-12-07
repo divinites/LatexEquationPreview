@@ -59,6 +59,7 @@ If auto-compile trigger in settings is set to `true`, then a preview with automa
 {
     "equation_foreground_color": "yellow",
     "equation_background_color": "",
+    "equation_inline_position": "right",
     "equation_inline_size": "45%",
     "equation_block_size": "60%",
     "auto_compile": true,
@@ -72,7 +73,9 @@ If auto-compile trigger in settings is set to `true`, then a preview with automa
 
 - equation_background_color is the color of preview background.
 
-- equation_inline/block_size is to adjust the font size of inline/block equations.
+- equation_inline_size is to adjust the font size of inline equations.
+
+- equation_inline_position is the control where to show the inline equation preview, default value is "right", which means the preview will show after the equation representation. If it is set to "left", the preview will show before the equation representation.
 
 - auto_comile is an amazing feature, it will simultaneously compile the equations that users are writing and show it in the phantom.
 

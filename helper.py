@@ -22,7 +22,8 @@ DOLLAR_BLOCK_SCOPE = "meta.environment.math.block.dollar.latex"
 BE_BLOCK_SCOPE = "meta.environment.math.block.be.latex"
 LATEXPLUS_SCOPE = "meta.function.environment.math.latex"
 
-SCOPES = [DOLLAR_INLINE_SCOPE, DOLLAR_BLOCK_SCOPE, BE_BLOCK_SCOPE, LATEXPLUS_SCOPE]
+SCOPES = [DOLLAR_INLINE_SCOPE, DOLLAR_BLOCK_SCOPE, BE_BLOCK_SCOPE,
+          LATEXPLUS_SCOPE]
 INLINE_FLAG = 0
 BLOCK_FLAG = 1
 PHANTOM_GROUP = 'latex_equation'
@@ -95,13 +96,15 @@ class ViewConverter:
                 return sublime.Region(start + 2, end + 1), BLOCK_FLAG
             elif selector == LATEXPLUS_SCOPE:
                 if self.view.substr(sublime.Region(end, end)) == '$':
-                    if self.view.substr(sublime.Region(end + 1, end + 1)) == '$':
+                    if self.view.substr(sublime.Region(end + 1, end +
+                                                       1)) == '$':
                         return sublime.Region(start + 2, end + 1), BLOCK_FLAG
                     else:
                         return sublime.Region(start + 1, end), INLINE_FLAG
                 else:
                     return sublime.Region(
-                        self.view.line(start).a, self.view.line(end).b), BLOCK_FLAG
+                        self.view.line(start).a,
+                        self.view.line(end).b), BLOCK_FLAG
             else:
                 return
 
@@ -204,7 +207,9 @@ def to_phantom(view, dir_name, file_name=None):
         group_name = PHANTOM_GROUP + str(content_region.b + 1)
         log('group_name is {}'.format(group_name))
         return {"region":
-                sublime.Region(content_region.b, content_region.b + 1),
+                sublime.Region(content_region.b, content_region.b + 1)
+                if plugin_settings.get("equation_inline_position") == "right"
+                else sublime.Region(content_region.a, content_region.a),
                 "content": html_str,
                 "layout": sublime.LAYOUT_BLOCK
                 if FLAG == BLOCK_FLAG else sublime.LAYOUT_INLINE,

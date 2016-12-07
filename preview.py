@@ -32,6 +32,16 @@ def plugin_unloaded():
         pass
 
 
+def is_showable():
+    view = sublime.active_window().active_view()
+    enabled_suffix = plugin_settings.get('enabled_for')
+    if view.file_name() and enabled_suffix:
+        for suffix in enabled_suffix:
+            if view.file_name().endswith(suffix):
+                return True
+    return False
+
+
 class PreviewMonitor(sublime_plugin.ViewEventListener):
     def __init__(self, view):
         self.view = view
@@ -41,8 +51,8 @@ class PreviewMonitor(sublime_plugin.ViewEventListener):
 
     @classmethod
     def is_applicable(cls, settings):
-        syntax = settings.get('syntax')
-        return 'TeX' in syntax and plugin_settings.get('auto_compile')
+        # syntax = settings.get('syntax')
+        return is_showable() and plugin_settings.get('auto_compile')
 
     def on_modified_async(self):
         if is_inside_equation(self.view):
@@ -75,10 +85,7 @@ class PreviewMonitor(sublime_plugin.ViewEventListener):
 
 class ShowOutstandingPreviewCommand(sublime_plugin.WindowCommand):
     def is_enable(self):
-        view = self.window.active_view()
-        if view.scope_name(0).startswith("text.tex"):
-            return True
-        return False
+        return is_showable()
 
     def run(self):
         view = self.window.active_view()
@@ -91,10 +98,7 @@ class ShowOutstandingPreviewCommand(sublime_plugin.WindowCommand):
 
 class CleanEquationPhantomsCommand(sublime_plugin.WindowCommand):
     def is_enable(self):
-        view = self.window.active_view()
-        if view.scope_name(0).startswith('text.tex'):
-            return True
-        return False
+        return is_showable()
 
     def run(self):
         global phantom_keys

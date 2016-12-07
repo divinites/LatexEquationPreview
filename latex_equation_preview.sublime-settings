@@ -2,9 +2,13 @@
     "equation_foreground_color": "yellow",
     "equation_background_color": "",
     "equation_inline_size": "45%",
+    "equation_inline_position": "right",
     "equation_block_size": "60%",
     "auto_compile": true,
     "convert_binary": "",
     "pdflatex_binary": "",
-    "debug": 0
+    "debug": 0,
+    "enabled_for": ["tex"],
+
+
 }
