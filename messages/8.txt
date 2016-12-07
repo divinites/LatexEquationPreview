@@ -1,0 +1,3 @@
+change log 0.8.0:
+
+add "equation_inline_position" in latex_equation_preview.sublime-settings
