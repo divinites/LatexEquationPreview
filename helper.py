@@ -138,11 +138,12 @@ class FileConverter:
         convert = plugin_settings.get("convert_binary", "convert"
                                       if sublime.platform() != 'windows' else
                                       'convert.exe')
+        border = plugin_settings.get("border", 0)
         directory, _ = os.path.split(file)
         os.chdir(directory)
         compile_cmd = [pdflatex, file]
         convert_cmd = [convert, '-density', '300', '-trim', '-quality', '100',
-                       pdf_name, png_name]
+                       '-border', str(border), pdf_name, png_name]
         foreground_color = plugin_settings.get('equation_foreground_color',
                                                'red')
         inline_size = plugin_settings.get('equation_inline_size', '100%')
